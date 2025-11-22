@@ -26,8 +26,9 @@ reports/           # project report or final documents
 ```
 
 ## 2. Set up environment
+```text
 pip install -r requirements.txt
-
+```
 
 ## 3. Run the Program
 Step 1 — Preprocess Data
