@@ -23,8 +23,9 @@ scripts/           # shell scripts to run preprocessing, training, and evaluatio
 
 notebooks/         # optional Jupyter notebooks for exploration and visualization
 reports/           # project report or final documents
+```
 
-## 2. Setup Environment
+## 2. Set up environment
 pip install -r requirements.txt
 
 
