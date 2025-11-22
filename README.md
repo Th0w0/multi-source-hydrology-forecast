@@ -32,13 +32,14 @@ pip install -r requirements.txt
 
 ## 3. Run the Program
 Step 1 — Preprocess Data
-
-Convert raw datasets into cleaned → processed datasets.
-
+```text
 bash scripts/preprocess.sh
-
+```
 Step 2 — Train the Model
+```text
 bash scripts/train.sh
-
+```
 Step 3 — Evaluate the Results
+```text
 bash scripts/evaluate.sh
+```
