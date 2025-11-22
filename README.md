@@ -23,3 +23,20 @@ scripts/           # shell scripts to run preprocessing, training, and evaluatio
 
 notebooks/         # optional Jupyter notebooks for exploration and visualization
 reports/           # project report or final documents
+
+## 2. Setup Environment
+pip install -r requirements.txt
+
+
+## 3. Run the Program
+Step 1 — Preprocess Data
+
+Convert raw datasets into cleaned → processed datasets.
+
+bash scripts/preprocess.sh
+
+Step 2 — Train the Model
+bash scripts/train.sh
+
+Step 3 — Evaluate the Results
+bash scripts/evaluate.sh
