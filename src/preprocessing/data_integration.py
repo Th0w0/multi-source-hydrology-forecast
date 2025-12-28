@@ -8,7 +8,7 @@ from datetime import datetime
 import xarray as xr
 
 from collections import defaultdict
-from count_record_grdc import count_records_2020
+# from count_record_grdc import count_records_2020
 from tqdm import tqdm
 from shapely import wkt
 from utils import *
@@ -522,54 +522,54 @@ def compute_upstream_bbox_from_step1(
     return west, south, east, north
 
 
-def count_records_for_selected_grdc(
-    grdc_dir,
-    station_basin_csv
-):
-    """
-    Count number of GRDC records (>=2020) 
-    only for stations that passed STEP 1
-    """
+# def count_records_for_selected_grdc(
+#     grdc_dir,
+#     station_basin_csv
+# ):
+#     """
+#     Count number of GRDC records (>=2020) 
+#     only for stations that passed STEP 1
+#     """
 
-    # --- đọc danh sách station hợp lệ
-    df_valid = pd.read_csv(station_basin_csv)
-    valid_ids = set(df_valid["grdc_no"].astype(str))
+#     # --- đọc danh sách station hợp lệ
+#     df_valid = pd.read_csv(station_basin_csv)
+#     valid_ids = set(df_valid["grdc_no"].astype(str))
 
-    print(f"\n📌 Số trạm hợp lệ sau STEP 1: {len(valid_ids)}\n")
+#     print(f"\n📌 Số trạm hợp lệ sau STEP 1: {len(valid_ids)}\n")
 
-    total = 0
-    per_station = {}
+#     total = 0
+#     per_station = {}
 
-    # --- duyệt folder GRDC
-    for fname in tqdm(
-        os.listdir(grdc_dir),
-        desc="Counting records (>=2020) for selected GRDC",
-        unit="file"
-    ):
-        if not fname.lower().endswith(".txt"):
-            continue
+#     # --- duyệt folder GRDC
+#     for fname in tqdm(
+#         os.listdir(grdc_dir),
+#         desc="Counting records (>=2020) for selected GRDC",
+#         unit="file"
+#     ):
+#         if not fname.lower().endswith(".txt"):
+#             continue
 
-        # GRDC-No thường nằm ở đầu filename
-        grdc_no = fname.split("_")[0]
+#         # GRDC-No thường nằm ở đầu filename
+#         grdc_no = fname.split("_")[0]
 
-        if grdc_no not in valid_ids:
-            continue
+#         if grdc_no not in valid_ids:
+#             continue
 
-        fp = os.path.join(grdc_dir, fname)
-        count = count_records_2020(fp)
+#         fp = os.path.join(grdc_dir, fname)
+#         count = count_records_2020(fp)
 
-        per_station[grdc_no] = count
-        total += count
+#         per_station[grdc_no] = count
+#         total += count
 
-    # --- in kết quả
-    print("\n================= RECORD COUNT (>=2020) =================")
-    for k, v in per_station.items():
-        print(f"GRDC {k}: {v} records")
-    print("----------------------------------------------------------")
-    print(f"🔥 TOTAL records (>=2020): {total}")
-    print("==========================================================\n")
+#     # --- in kết quả
+#     print("\n================= RECORD COUNT (>=2020) =================")
+#     for k, v in per_station.items():
+#         print(f"GRDC {k}: {v} records")
+#     print("----------------------------------------------------------")
+#     print(f"🔥 TOTAL records (>=2020): {total}")
+#     print("==========================================================\n")
 
-    return per_station, total
+#     return per_station, total
 
 def is_ambiguous_station(
     pt,

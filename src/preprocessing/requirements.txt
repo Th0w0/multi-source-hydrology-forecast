@@ -1,0 +1,6 @@
+pandas
+geopandas
+xarray
+regionmask
+shapely
+tqdm
