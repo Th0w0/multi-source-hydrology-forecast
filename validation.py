@@ -8,11 +8,8 @@ import matplotlib.pyplot as plt
 import warnings
 import math
 
-# =========================
-# CONFIG
-# =========================
 ROOT = Path(r"C:\BKHN\Data Science")
-NOAA_ROOT = ROOT / "NOAA"          # FLAT folder
+NOAA_ROOT = ROOT / "NOAA"        
 GPM_ROOT = ROOT / "subset_GPM_3IMERGDE_2015_2024"
 RESULTS = ROOT / "results_gpm_validation_sa"
 RESULTS.mkdir(exist_ok=True)
@@ -23,9 +20,6 @@ FULL_INDEX = pd.date_range(DATE_START, DATE_END, freq="D")
 
 PPT_VAR_CANDIDATES = ["precipitationCal", "precipitation", "precip"]
 
-# =========================
-# GPM FILE MAP
-# =========================
 def find_gpm_files(gpm_root: Path):
     files = sorted(gpm_root.glob("*.nc4")) + sorted(gpm_root.glob("*.nc"))
     mapping = {}
@@ -40,9 +34,6 @@ def find_gpm_files(gpm_root: Path):
 GPM_MAP = find_gpm_files(GPM_ROOT)
 print(f"Found {len(GPM_MAP)} GPM files")
 
-# =========================
-# HELPERS
-# =========================
 def detect_ppt_var(ds: xr.Dataset):
     for c in PPT_VAR_CANDIDATES:
         if c in ds.variables:
@@ -88,9 +79,6 @@ def get_nasa_nearest(gpm_file, lat, lon):
     except Exception:
         return np.nan, np.nan
 
-# =========================
-# NOAA READER
-# =========================
 def read_noaa_station_csv(csv_path: Path):
     df = pd.read_csv(csv_path, low_memory=False)
 
@@ -109,9 +97,6 @@ def read_noaa_station_csv(csv_path: Path):
         "lon": lon
     }
 
-# =========================
-# BUILD DAILY SERIES (KEEP GAPS)
-# =========================
 def build_daily_series(noaa_rec):
     df = noaa_rec["df"].copy()
     df.index = pd.to_datetime(df.index)
@@ -135,9 +120,6 @@ def add_gpm_series(daily, lat, lon):
     daily["nasa_dist_km"] = nasa_dists
     return daily
 
-# =========================
-# METRICS (OVERLAP ONLY)
-# =========================
 def compute_metrics(daily):
     overlap = daily.dropna(subset=["noaa_ppt", "nasa_ppt"])
     if overlap.empty:
@@ -151,9 +133,6 @@ def compute_metrics(daily):
         "n_pairs": len(x)
     }
 
-# =========================
-# PLOTS (SHOW GAPS)
-# =========================
 def plot_station(daily, sid, metrics, outdir):
     outdir.mkdir(exist_ok=True)
 
@@ -183,9 +162,6 @@ def plot_station(daily, sid, metrics, outdir):
         plt.savefig(outdir / f"{sid}_scatter.png")
         plt.close()
 
-# =========================
-# MAIN
-# =========================
 def process_all():
     summary = []
 
@@ -208,12 +184,10 @@ def process_all():
         outdir = RESULTS / f"{rec['id']}_validation"
         outdir.mkdir(parents=True, exist_ok=True)
 
-        # ---- save aligned daily ----
         daily.reset_index().rename(columns={"index":"DATE"}).to_csv(
             outdir / f"{rec['id']}_aligned_daily.csv", index=False
         )
 
-        # ---- save per-station metrics (NEW) ----
         pd.DataFrame([{
             "station": rec["id"],
             "corr": metrics["corr"],
@@ -251,6 +225,6 @@ def process_all():
     for v in GPM_DS_CACHE.values():
         v["ds"].close()
 
-# =========================
 if __name__ == "__main__":
     process_all()
+
