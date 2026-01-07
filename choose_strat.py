@@ -2,9 +2,6 @@ from pathlib import Path
 import pandas as pd
 from pandas.errors import EmptyDataError
 
-# =========================
-# CONFIG
-# =========================
 ROOT = Path(r"C:\BKHN\Data Science")
 VALIDATION_DIR = ROOT / "results_gpm_validation"
 OUTPUT_CSV = ROOT / "stations_fill_strategy.csv"
@@ -16,14 +13,10 @@ MAX_ABS_MBE = 20.0
 
 records = []
 
-# =========================
-# MAIN LOOP (ROBUST)
-# =========================
 for station_dir in sorted(VALIDATION_DIR.glob("*_validation")):
     station = station_dir.name.replace("_validation", "")
     metric_file = station_dir / f"{station}_seasonal_metrics.csv"
 
-    # ---- case 1: file không tồn tại
     if not metric_file.exists():
         records.append({
             "station": station,
@@ -33,11 +26,9 @@ for station_dir in sorted(VALIDATION_DIR.glob("*_validation")):
         })
         continue
 
-    # ---- case 2: đọc file an toàn
     try:
         df = pd.read_csv(metric_file)
     except EmptyDataError:
-        # FILE CÓ NHƯNG KHÔNG CÓ HEADER
         records.append({
             "station": station,
             "strategy": "DO_NOT_FILL",
@@ -46,7 +37,6 @@ for station_dir in sorted(VALIDATION_DIR.glob("*_validation")):
         })
         continue
 
-    # ---- case 3: dataframe rỗng
     if df.empty or "season" not in df.columns:
         records.append({
             "station": station,
@@ -56,9 +46,6 @@ for station_dir in sorted(VALIDATION_DIR.glob("*_validation")):
         })
         continue
 
-    # =========================
-    # NORMAL PROCESS
-    # =========================
     df["season"] = df["season"].str.lower()
 
     wet = df[df["season"] == "wet"]
@@ -104,9 +91,6 @@ for station_dir in sorted(VALIDATION_DIR.glob("*_validation")):
         "dry_days": d["n_days"],
     })
 
-# =========================
-# SAVE
-# =========================
 out = pd.DataFrame(records)
 
 out = out.sort_values(
@@ -121,3 +105,4 @@ print(OUTPUT_CSV)
 
 print("\nStrategy summary:")
 print(out["strategy"].value_counts())
+
