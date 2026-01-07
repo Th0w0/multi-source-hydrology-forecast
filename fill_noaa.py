@@ -4,9 +4,6 @@ import numpy as np
 import xarray as xr
 from sklearn.linear_model import LinearRegression
 
-# ==================================================
-# CONFIG
-# ==================================================
 ROOT = Path(r"C:\BKHN\Data Science")
 
 NOAA_DIR = ROOT / "NOAA"
@@ -22,12 +19,8 @@ NOAA_FILLED_DIR.mkdir(exist_ok=True)
 
 PPT_CANDIDATES = ["precipitationCal", "precipitation", "precip"]
 
-# threshold mưa rất nhỏ (mm/day)
 DRY_EPS = 0.2
 
-# ==================================================
-# HELPERS
-# ==================================================
 def is_wet_month(m):
     return m in [10, 11, 12, 1, 2, 3, 4]
 
@@ -64,19 +57,12 @@ def read_gpm_daily(date, lat, lon):
     except Exception:
         return np.nan
 
-# ==================================================
-# LOAD STRATEGY
-# ==================================================
 strategy_df = pd.read_csv(STRATEGY_CSV).set_index("station")
 
-# ==================================================
-# MAIN LOOP
-# ==================================================
 for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
     station = noaa_file.stem
     print(f"\nProcessing {station}")
 
-    # ---- skip if not in strategy or DO_NOT_FILL
     if station not in strategy_df.index:
         print("  -> Skip (no strategy)")
         continue
@@ -86,9 +72,6 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
         print("  -> Skip (DO_NOT_FILL)")
         continue
 
-    # ==================================================
-    # LOAD NOAA
-    # ==================================================
     df = pd.read_csv(noaa_file)
 
     date_col = next(c for c in df.columns if "date" in c.lower())
@@ -106,17 +89,11 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
     df = df.reindex(FULL_INDEX)
     df.index.name = "DATE"
 
-    # ==================================================
-    # READ GPM
-    # ==================================================
     df["gpm"] = [
         read_gpm_daily(d, lat, lon)
         for d in df.index
     ]
 
-    # ==================================================
-    # TRAIN REGRESSION (IF NEEDED)
-    # ==================================================
     a = b = None
     if strategy == "LINEAR_REGRESSION":
         wet_train = df[
@@ -133,9 +110,6 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
         else:
             strategy = "FILL_PLUS_BIAS"
 
-    # ==================================================
-    # COMPUTE WET BIAS (SAFE)
-    # ==================================================
     wet_bias = (
         df.loc[
             df.index.month.map(is_wet_month)
@@ -155,20 +129,15 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
     if np.isnan(wet_bias):
         wet_bias = 0.0
 
-    # ==================================================
-    # FILL LOGIC (WITH THRESHOLD – NO NaN)
-    # ==================================================
     filled = []
     method = []
 
     for d, r in df.iterrows():
-        # ---- NOAA exists
         if not pd.isna(r["noaa"]):
             filled.append(r["noaa"])
             method.append("NOAA")
             continue
 
-        # ---- GPM missing
         if pd.isna(r["gpm"]):
             filled.append(0.0)
             method.append("GPM_MISSING_ZERO")
@@ -177,13 +146,11 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
         gpm_val = r["gpm"]
         wet = is_wet_month(d.month)
 
-        # ---- threshold: very small GPM -> no rain
         if gpm_val < DRY_EPS:
             filled.append(0.0)
             method.append("GPM_BELOW_THRESHOLD")
             continue
 
-        # ---- apply fill
         if wet:
             if strategy == "LINEAR_REGRESSION" and a is not None:
                 filled.append(max(0.0, a * gpm_val + b))
@@ -204,3 +171,4 @@ for noaa_file in sorted(NOAA_DIR.glob("*.csv")):
     print(f"  -> Saved {out_path.name}")
 
 print("\nDONE")
+
