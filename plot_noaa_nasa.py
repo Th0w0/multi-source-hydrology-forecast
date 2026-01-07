@@ -2,9 +2,6 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# =========================
-# CONFIG
-# =========================
 ROOT = Path(r"C:\BKHN\Data Science\results_gpm_validation")
 
 CSV_SUFFIX = "_aligned.csv"
@@ -12,15 +9,11 @@ FIG_NAME = "noaa_vs_nasa_timeseries_overlap.png"
 
 DATE_COL = "DATE"
 
-# Các tên cột có thể gặp
 NOAA_CANDIDATES = ["PRCP_NOAA", "PRCP", "precip", "precip_noaa"]
 NASA_CANDIDATES = ["PRCP_GPM", "GPM", "precip_gpm", "precipitationCal"]
 
 INVALID_MIN = 0.0
 
-# =========================
-# PROCESS
-# =========================
 for station_dir in sorted(ROOT.glob("*_validation")):
     if not station_dir.is_dir():
         continue
@@ -35,7 +28,6 @@ for station_dir in sorted(ROOT.glob("*_validation")):
 
     df = pd.read_csv(csv_path, parse_dates=[DATE_COL])
 
-    # ---- detect NOAA column
     noaa_col = next((c for c in NOAA_CANDIDATES if c in df.columns), None)
     nasa_col = next((c for c in NASA_CANDIDATES if c in df.columns), None)
 
@@ -44,10 +36,8 @@ for station_dir in sorted(ROOT.glob("*_validation")):
         print(f"     Columns found: {list(df.columns)}")
         continue
 
-    # ---- select + sort
     df = df[[DATE_COL, noaa_col, nasa_col]].sort_values(DATE_COL)
 
-    # ---- overlap only
     df = df[
         (df[noaa_col].notna()) &
         (df[nasa_col].notna()) &
@@ -59,9 +49,6 @@ for station_dir in sorted(ROOT.glob("*_validation")):
         print("  -> Skip (no overlap data)")
         continue
 
-    # =========================
-    # PLOT
-    # =========================
     plt.figure(figsize=(14, 4))
     plt.plot(df[DATE_COL], df[noaa_col], label="NOAA", linewidth=1.2)
     plt.plot(df[DATE_COL], df[nasa_col], label="NASA", linewidth=1.2)
@@ -80,3 +67,4 @@ for station_dir in sorted(ROOT.glob("*_validation")):
     print(f"  -> Saved: {out_path}")
 
 print("DONE")
+
