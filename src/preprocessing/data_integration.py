@@ -122,7 +122,7 @@ def build_grdc_upstream_mapping(
 
         except Exception as e:
             msg = f"[WARNING] Skip GRDC file {fname}: {e}"
-            print(msg)
+            logging.warning(msg)
             warnings.append(msg)
 
     grdc_df = pd.DataFrame(records)
@@ -130,11 +130,11 @@ def build_grdc_upstream_mapping(
     
     if warnings:
         logging.warning(f"Skip GRDC file {fname}: {e}")
-        print("\n[WARNING LIST]")
+        logging.warning("WARNING LIST:")
         for w in warnings[:10]:
-            print(w)
+            logging.warning(w)
         if len(warnings) > 10:
-            print(f"... ({len(warnings) - 10} more warnings)")
+            logging.warning(f"... ({len(warnings) - 10} more warnings)")
     
     # Aggregate HydroBasin to csv
     hydrobasin_df = aggregate_basin(
@@ -357,9 +357,8 @@ def validate_upstream_totalarea(
             )
 
 
-    print(
-        f"({n_warn} warnings)"
-    )
+    if n_warn > 0:
+        logging.warning(f"({n_warn} warnings)")
 
     return check_df
 
@@ -787,7 +786,7 @@ def process_discharge_and_precipitation(
     )
     final_df = final_df.rename(columns={"discharge_cms": "q_obs"})
     final_df = final_df.rename(columns={"prcp_upstream_mm": "prcp_NOAA"})
-    print(final_df.columns.tolist())
+    logging.info(f"Final columns: {final_df.columns.tolist()}")
 
 
     # Save discharge
@@ -1184,7 +1183,7 @@ def validate_discharge_precipitation_output(
     - Save validated CSV
     - Print statistics
     """
-    print("[VALIDATE] Loading STEP 3 output...")
+    logging.info("[VALIDATE] Loading STEP 3 output...")
     df = pd.read_csv(in_csv)
 
     n_total = len(df)
@@ -1205,19 +1204,18 @@ def validate_discharge_precipitation_output(
     n_valid = len(df_valid)
 
     # --- stats
-    print("\n[VALIDATE STATS]")
-    print(f"Total records          : {n_total}")
-    print(f"Removed (no discharge) : {n_no_discharge}")
-    print(f"Removed (zero precip)  : {n_zero_prcp}")
-    print(f"Total removed          : {n_invalid}")
-    print(f"Remaining valid        : {n_valid}")
-    print(f"Retention rate (%)     : {n_valid / n_total * 100:.2f}")
+    logging.info("VALIDATE STATS:")
+    logging.info(f"Total records          : {n_total}")
+    logging.info(f"Removed (no discharge) : {n_no_discharge}")
+    logging.info(f"Removed (zero precip)  : {n_zero_prcp}")
+    logging.info(f"Total removed          : {n_invalid}")
+    logging.info(f"Remaining valid        : {n_valid}")
+    logging.info(f"Retention rate (%%)     : {n_valid / n_total * 100:.2f}")
 
     # --- save
     df_valid.to_csv(out_valid_csv, index=False)
 
-    print(f"\n[VALIDATE DONE]")
-    print(f"Valid data saved → {out_valid_csv}")
+    logging.info(f"VALIDATE DONE. Valid data saved → {out_valid_csv}")
 
     return df_valid
 
