@@ -69,7 +69,7 @@ STEP4_ECMWF_CSV = os.path.join(STEP4_DIR, "grdc_upstream_ecmwf_daily.csv")
 
 
 STEP2B_DISCHARGE_CSV = os.path.join(STEP2B_DIR,"grdc_discharge.csv")
-STEP3B_precipitaion_csv = os.path.join(STEP3B_DIR, "precipitation_extraction")
+STEP3B_precipitaion_csv = os.path.join(STEP3B_DIR, "precipitation_extraction.csv")
 STEP4B_ECMWF_CSV = os.path.join(STEP4B_DIR, "grdc_upstream_ecmwf_daily.csv")
 STEP4B_ECMWF_opt_CSV = os.path.join(STEP4B_DIR, "grdc_upstream_ecmwf_daily_optimized.csv")
 STEP4B_ECMWF_opt2_CSV = os.path.join(STEP4B_DIR, "grdc_upstream_ecmwf_daily_optimized2.csv")

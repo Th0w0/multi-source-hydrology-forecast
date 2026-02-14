@@ -8,7 +8,7 @@ To run the pipeline, you must first download the required datasets and place the
 
 ### Step 1: Download Data
 Download the data archive from the following Google Drive link:
-**[INSERT DRIVE LINK HERE]**
+[Google Drive Link](https://drive.google.com/drive/folders/1vL67ak6tTVeQAzjSVoxWxam4rfcOHDAo?usp=drive_link)
 
 ### Step 2: Extract Data
 Extract the downloaded file into the `data/` directory at the root of this project.
@@ -33,7 +33,6 @@ Install the required Python dependencies:
 
 ```bash
 pip install -r requirements.txt
-pip install fire  # if not already in requirements
 ```
 
 ## 3. Running the Pipeline
