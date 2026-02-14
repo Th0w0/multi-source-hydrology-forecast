@@ -1,45 +1,75 @@
-# Multi-source flood detection and Damage Analysis system
+# Multi-source Hydrology Forecast
 
-This project implements a data processing pipeline and an AI-based forecasting model using multi-source hydrological and meteorological datasets.  
-The instructions below explain how to set up the environment, understand the project structure, and run the full pipeline.
+This project implements a data processing pipeline for multi-source hydrological and meteorological datasets, supporting two main workflows: **Station-based** and **Grid-based**.
 
----
+## 1. Data Setup
 
-## 1. Project Structure
+To run the pipeline, you must first download the required datasets and place them in the correct directory structure.
+
+### Step 1: Download Data
+Download the data archive from the following Google Drive link:
+**[INSERT DRIVE LINK HERE]**
+
+### Step 2: Extract Data
+Extract the downloaded file into the `data/` directory at the root of this project.
+
+### Step 3: Verify Structure
+Ensure your `data/` directory looks like this:
 
 ```text
 data/
-  raw/          # original downloaded datasets (ERA5-Land, IMERG, CPC, GRDC...)
-  cleaned/      # cleaned & aligned data (after basic QC)
-  processed/    # fully preprocessed data ready for model input
-
-src/
-  preprocessing/   # all preprocessing steps (cleaning, merging, area-weighted, imputation, normalization, sequences)
-  models/          # forecasting model (LSTM, trainer, metrics)
-  evaluation/      # evaluation scripts (return periods, comparison, visualization)
-  utils/           # helper utilities (config loader, geo functions, etc.)
-
-scripts/           # shell scripts to run preprocessing, training, and evaluation
-
-notebooks/         # optional Jupyter notebooks for exploration and visualization
-reports/           # project report or final documents
+├── grdc/                     # GRDC Station Data
+├── BasinATLAS_v10_lev08.csv  # HydroATLAS Data
+├── HydroBasin.csv            # HydroBASINS CSVs
+├── precipitation_grid/       # Grid Precipitation
+├── era5.grib                 # ERA5 Data
+├── era5_merged/              # Merged ERA5 Data
+└── g/                        # TIGGE/GRIB Data (e.g., 2025_01.grib)
 ```
 
-## 2. Set up environment
-```text
+## 2. Environment Setup
+
+Install the required Python dependencies:
+
+```bash
 pip install -r requirements.txt
+pip install fire  # if not already in requirements
 ```
 
-## 3. Run the Program
-Step 1 — Preprocess Data
-```text
-bash scripts/preprocess.sh
+## 3. Running the Pipeline
+
+There are two main workflows available. You can run them using the provided shell scripts or directly via Python.
+
+### Workflow 1: NOAA Station Data
+This workflow processes station-based data (Step 1 -> Step 2 -> Step 3 -> Step 4 -> Step 5).
+
+**Using Shell Script:**
+```bash
+sh run_station_workflow.sh
 ```
-Step 2 — Train the Model
-```text
-bash scripts/train.sh
+
+**Using Python:**
+```bash
+python src/run_pipeline.py station --start_date=2019-01-01 --end_date=2024-12-31
 ```
-Step 3 — Evaluate the Results
-```text
-bash scripts/evaluate.sh
+
+**Output:**
+Results will be saved in `output/final_station/`.
+
+---
+
+### Workflow 2: NOAA Grid Data
+This workflow processes grid-based data (Step 1 -> Step 2b -> Step 3b -> Step 4 -> Step 5).
+
+**Using Shell Script:**
+```bash
+sh run_grid_workflow.sh
 ```
+
+**Using Python:**
+```bash
+python src/run_pipeline.py grid --start_date=2000-01-01 --end_date=2025-12-31
+```
+
+**Output:**
+Results will be saved in `output/final_grid/`.
